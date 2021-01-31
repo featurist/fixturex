@@ -1,18 +1,14 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Fixturex do
   it 'works' do
-    tree = Fixturex.build_dependency_graph('users', 'bob')
+    tree = Fixturex::TreeBuilder.new.build_dependency_graph('users', 'bob')
 
-    puts tree.to_h
-    expect(tree.to_h).to eq({
-      value: {
-        fixture_type: 'users',
-        fixture_name: 'bob',
-        file_path: 'test/fixtures/users.yml',
-        line: 3
-      },
-      children: []
-    })
+    entry_value = tree.value
+    expect(entry_value.path).to eq(Rails.root.join('test/fixtures/users.yml').to_s)
+    expect(entry_value.line_number).to eq(3)
+    expect(tree.children).to eq([])
   end
 end
