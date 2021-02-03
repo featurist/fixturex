@@ -15,6 +15,7 @@ end
 require 'bundler/setup'
 require 'awesome_print'
 require 'fixturex'
+require 'json'
 
 require_relative './dummy/config/environment'
 require 'rspec/rails'
