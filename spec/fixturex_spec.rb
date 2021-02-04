@@ -53,6 +53,14 @@ RSpec.describe Fixturex do
                     line: 4
                   },
                   children: []
+                },
+                {
+                  value: {
+                    name: 'oak_trunk',
+                    path: Rails.root.join('test/fixtures/trunks.yml').to_s,
+                    line: 1
+                  },
+                  children: []
                 }
               ]
             },
@@ -62,7 +70,16 @@ RSpec.describe Fixturex do
                 path: Rails.root.join('test/fixtures/trees.yml').to_s,
                 line: 4
               },
-              children: []
+              children: [
+                {
+                  value: {
+                    name: 'pine_trunk',
+                    path: Rails.root.join('test/fixtures/trunks.yml').to_s,
+                    line: 4
+                  },
+                  children: []
+                }
+              ]
             }
           ]
         }

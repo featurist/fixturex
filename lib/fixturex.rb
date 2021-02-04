@@ -38,7 +38,7 @@ module Fixturex
     private
 
     def nested_fixtures(fixture)
-      fixture.model_class.reflect_on_all_associations(:has_many).each_with_object([]) do |association, acc|
+      associations_for_nested_models(fixture.model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
         model_fixtures = ModelFixtures.new(association.class_name)
 
@@ -48,6 +48,11 @@ module Fixturex
           acc << build_dependency_graph(model_fixtures.fixtures_path, fixture_name)
         end
       end
+    end
+
+    def associations_for_nested_models(model_class)
+      model_class.reflect_on_all_associations(:has_many) +
+        model_class.reflect_on_all_associations(:has_one)
     end
 
     def belongs_to_attribute_for_association(association)
