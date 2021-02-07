@@ -29,21 +29,36 @@ module Fixturex
     end
   end
 
-  class TreeBuilder
-    def build_dependency_graph(fixture_path, fixture_name)
-      fixture = Fixture.new(fixture_path, fixture_name)
-      TreeEntry.new(fixture, nested_fixtures(fixture))
+  FixtureModel = Struct.new(:fixture_path) do
+    def model_class
+      ActiveRecord::FixtureSet.default_fixture_model_name(fixture_set).constantize
     end
 
     private
 
-    def nested_fixtures(fixture)
-      associations_for_nested_models(fixture.model_class).each_with_object([]) do |association, acc|
+    def fixture_set
+      # TODO: work out fixture root
+      fixture_path.to_s.sub(Rails.root.join('test', 'fixtures').to_s, '')[1..].sub('.yml', '')
+    end
+  end
+
+  class TreeBuilder
+    def build_dependency_graph(fixture_path, fixture_name)
+      TreeEntry.new(
+        FixtureLocation.new(fixture_path, fixture_name),
+        nested_fixtures_locations(FixtureModel.new(fixture_path).model_class, fixture_name)
+      )
+    end
+
+    private
+
+    def nested_fixtures_locations(fixture_model_class, parent_fixture_name)
+      associations_for_nested_models(fixture_model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
         model_fixtures = ModelFixtures.new(association.class_name)
 
         model_fixtures.fixtures.each do |fixture_name, attributes|
-          next if attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != fixture.name
+          next if attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
 
           acc << build_dependency_graph(model_fixtures.fixtures_path, fixture_name)
         end
@@ -73,7 +88,7 @@ module Fixturex
     end
   end
 
-  Fixture = Struct.new(:path, :name) do
+  FixtureLocation = Struct.new(:path, :name) do
     def line
       File.readlines(path).each_with_index do |line, index|
         return index + 1 if line.match?(/^#{name}:/)
@@ -82,23 +97,12 @@ module Fixturex
       raise "Couldn't fine line number for '#{path}:#{name}'"
     end
 
-    def model_class
-      ActiveRecord::FixtureSet.default_fixture_model_name(fixture_set).constantize
-    end
-
     def to_h
       {
         name: name,
         path: path.to_s,
         line: line
       }
-    end
-
-    private
-
-    def fixture_set
-      # TODO: work out fixture root
-      path.to_s.sub(Rails.root.join('test', 'fixtures').to_s, '')[1..].sub('.yml', '')
     end
   end
 end
