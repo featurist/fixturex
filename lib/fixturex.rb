@@ -31,6 +31,8 @@ module Fixturex
 
   FixtureModel = Struct.new(:fixture_path) do
     def model_class
+      # TODO: support custom model_class from yaml
+      # TODO: support (or document the limitation) `set_fixture_class my_products: Product`
       ActiveRecord::FixtureSet.default_fixture_model_name(fixture_set).constantize
     end
 

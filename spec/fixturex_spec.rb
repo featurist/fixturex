@@ -86,4 +86,49 @@ RSpec.describe Fixturex do
       )
     )
   end
+
+  it 'follows polymorphic associations' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+      Rails.root.join('test/fixtures/posts.yml'),
+      'post_with_attachment'
+    )
+
+    expect(JSON.pretty_generate(tree.to_h)).to eq(
+      JSON.pretty_generate(
+        {
+          value: {
+            name: 'post_with_attachment',
+            path: Rails.root.join('test/fixtures/posts.yml').to_s,
+            line: 1
+          },
+          children: [
+            {
+              value: {
+                name: 'post_1_picture_1',
+                path: Rails.root.join('test/fixtures/pictures.yml').to_s,
+                line: 1
+              },
+              children: []
+            },
+            {
+              value: {
+                name: 'post_1_picture_2',
+                path: Rails.root.join('test/fixtures/pictures.yml').to_s,
+                line: 5
+              },
+              children: []
+            },
+            {
+              value: {
+                name: 'post_attachment',
+                path: Rails.root.join('test/fixtures/attachments.yml').to_s,
+                line: 1
+              },
+              children: []
+            }
+          ]
+        }
+      )
+    )
+  end
 end

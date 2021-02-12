@@ -18,6 +18,9 @@ require 'fixturex'
 require 'json'
 
 require_relative './dummy/config/environment'
+ActiveRecord::Schema.verbose = false
+load "#{Rails.root}/db/schema.rb"
+
 require 'rspec/rails'
 
 RSpec.configure do |config|

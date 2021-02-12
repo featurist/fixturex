@@ -1,0 +1,11 @@
+post_1_picture_1:
+  imageable: post_with_attachment
+  imageable_type: Post
+
+post_1_picture_2:
+  imageable: post_with_attachment
+  imageable_type: Post
+
+post_2_picture_1:
+  imageable: post_1
+  imageable_type: Post

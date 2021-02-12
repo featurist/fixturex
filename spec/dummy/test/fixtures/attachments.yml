@@ -1,0 +1,3 @@
+post_attachment:
+  attachable: post_with_attachment
+  attachable_type: Post
