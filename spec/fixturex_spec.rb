@@ -131,4 +131,33 @@ RSpec.describe Fixturex do
       )
     )
   end
+
+  it 'handles belongs_to with custom :class_name' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+      Rails.root.join('test/fixtures/writers.yml'),
+      'kevin'
+    )
+
+    expect(JSON.pretty_generate(tree.to_h)).to eq(
+      JSON.pretty_generate(
+        {
+          value: {
+            name: 'kevin',
+            path: Rails.root.join('test/fixtures/writers.yml').to_s,
+            line: 1
+          },
+          children: [
+            {
+              value: {
+                name: 'kevins_book',
+                path: Rails.root.join('test/fixtures/books.yml').to_s,
+                line: 4
+              },
+              children: []
+            }
+          ]
+        }
+      )
+    )
+  end
 end

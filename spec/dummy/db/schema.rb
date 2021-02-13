@@ -35,5 +35,14 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :trunks, force: true do |t|
     t.column :tree_id, :integer
   end
+
+  create_table :writers, force: true do |t|
+    t.column :name, :string
+  end
+
+  create_table :books, force: true do |t|
+    t.column :name, :string
+    t.column :writer_id, :integer
+  end
 end
 # rubocop:enable Metrics/BlockLength
