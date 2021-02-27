@@ -54,8 +54,8 @@ module Fixturex
 
     private
 
-    def nested_fixtures_locations(fixture_model_class, parent_fixture_name)
-      associations_for_nested_models(fixture_model_class).each_with_object([]) do |association, acc|
+    def nested_fixtures_locations(parent_fixture_model_class, parent_fixture_name)
+      associations_for_nested_models(parent_fixture_model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
         model_fixtures = ModelFixtures.new(association.class_name)
 

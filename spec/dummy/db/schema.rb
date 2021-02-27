@@ -44,5 +44,13 @@ ActiveRecord::Schema.define(version: 1) do
     t.column :name, :string
     t.column :writer_id, :integer
   end
+
+  create_table :customers, force: true do |t|
+    t.column :name, :string
+  end
+
+  create_table :finance_orders, force: true do |t|
+    t.column :customer_id, :integer
+  end
 end
 # rubocop:enable Metrics/BlockLength
