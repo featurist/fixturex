@@ -168,4 +168,35 @@ RSpec.describe Fixturex do
       )
     )
   end
+
+  # TODO: is it possible for same STI fixtures to be both in superclass.yml and its own yml?
+  it 'handles STI (fixtures reside in a file named after superclass)' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+      Rails.root.join('test/fixtures/customers.yml'),
+      'alice'
+    )
+
+    expect(JSON.pretty_generate(tree.children.map(&:to_h))).to eq(
+      JSON.pretty_generate(
+        [
+          {
+            value: {
+              name: 'alices_shipping_address',
+              path: Rails.root.join('test/fixtures/addresses.yml').to_s,
+              line: 1
+            },
+            children: []
+          },
+          {
+            value: {
+              name: 'alices_billing_address',
+              path: Rails.root.join('test/fixtures/addresses.yml').to_s,
+              line: 5
+            },
+            children: []
+          }
+        ]
+      )
+    )
+  end
 end

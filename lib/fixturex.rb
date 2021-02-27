@@ -6,24 +6,34 @@ require 'fixturex/version'
 module Fixturex
   class Error < StandardError; end
 
-  ModelFixtures = Struct.new(:class_name) do
-    def fixture_set
-      class_name.tableize
+  # Fixtures for model class
+  class ModelFixtures
+    attr_reader :fixtures_path, :fixtures_set
+
+    def initialize(class_name)
+      klass = class_name.constantize
+
+      while klass < ActiveRecord::Base
+        fixture_file = "#{klass.to_s.tableize}.yml"
+        path = Rails.root.join('test', 'fixtures', *fixture_file.split('/'))
+
+        if File.exist?(path)
+          @fixture_set = klass.to_s.tableize
+          @fixtures_path = path
+        end
+
+        klass = klass.superclass
+      end
     end
 
     def fixtures
       @fixtures ||= load_fixture_file
     end
 
-    def fixtures_path
-      fixture_file = "#{fixture_set}.yml"
-      Rails.root.join('test', 'fixtures', *fixture_file.split('/'))
-    end
-
     private
 
     def load_fixture_file
-      return {} unless File.exist?(fixtures_path)
+      return {} unless fixtures_path
 
       YAML.load_file(fixtures_path)
     end
@@ -61,6 +71,7 @@ module Fixturex
 
         model_fixtures.fixtures.each do |fixture_name, attributes|
           next if attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
+          next if attributes['type'] && attributes['type'] != association.class_name
 
           acc << build_dependency_graph(model_fixtures.fixtures_path, fixture_name)
         end

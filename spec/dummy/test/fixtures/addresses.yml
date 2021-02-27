@@ -1,0 +1,7 @@
+alices_shipping_address:
+  type: ShippingAddress
+  customer: alice
+
+alices_billing_address:
+  type: BillingAddress
+  customer: alice
