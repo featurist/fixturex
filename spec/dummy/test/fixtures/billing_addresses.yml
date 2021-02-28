@@ -1,0 +1,4 @@
+# STI subclass in its own fixture file
+alices_billing_address_2:
+  type: BillingAddress
+  customer: alice

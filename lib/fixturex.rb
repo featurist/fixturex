@@ -8,34 +8,32 @@ module Fixturex
 
   # Fixtures for model class
   class ModelFixtures
-    attr_reader :fixtures_path, :fixtures_set
+    Fixture = Struct.new(:name, :path, :attributes)
 
-    def initialize(class_name)
+    def self.load(class_name)
+      fixtures_paths(class_name).each_with_object([]) do |path, acc|
+        fixtures = YAML.load_file(path)
+        fixtures.select! do |_name, attributes|
+          # if fixture has `type` - STI - then we only want type == class_name
+          attributes['type'].nil? || attributes['type'] == class_name
+        end
+        acc.concat(fixtures.map { |name, attributes| Fixture.new(name, path, attributes) })
+      end
+    end
+
+    def self.fixtures_paths(class_name)
+      fixtures_paths = []
       klass = class_name.constantize
 
       while klass < ActiveRecord::Base
         fixture_file = "#{klass.to_s.tableize}.yml"
         path = Rails.root.join('test', 'fixtures', *fixture_file.split('/'))
 
-        if File.exist?(path)
-          @fixture_set = klass.to_s.tableize
-          @fixtures_path = path
-        end
+        fixtures_paths << path if File.exist?(path)
 
         klass = klass.superclass
       end
-    end
-
-    def fixtures
-      @fixtures ||= load_fixture_file
-    end
-
-    private
-
-    def load_fixture_file
-      return {} unless fixtures_path
-
-      YAML.load_file(fixtures_path)
+      fixtures_paths
     end
   end
 
@@ -67,13 +65,12 @@ module Fixturex
     def nested_fixtures_locations(parent_fixture_model_class, parent_fixture_name)
       associations_for_nested_models(parent_fixture_model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
-        model_fixtures = ModelFixtures.new(association.class_name)
+        model_fixtures = ModelFixtures.load(association.class_name)
 
-        model_fixtures.fixtures.each do |fixture_name, attributes|
-          next if attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
-          next if attributes['type'] && attributes['type'] != association.class_name
+        model_fixtures.each do |fixture|
+          next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
 
-          acc << build_dependency_graph(model_fixtures.fixtures_path, fixture_name)
+          acc << build_dependency_graph(fixture.path, fixture.name)
         end
       end
     end
