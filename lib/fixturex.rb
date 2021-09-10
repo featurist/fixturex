@@ -53,7 +53,7 @@ module Fixturex
   end
 
   class TreeBuilder
-    def build_dependency_graph(fixture_path, fixture_name)
+    def build_dependency_tree(fixture_path, fixture_name)
       TreeEntry.new(
         FixtureLocation.new(fixture_path, fixture_name),
         nested_fixtures_locations(FixtureModel.new(fixture_path).model_class, fixture_name)
@@ -70,7 +70,7 @@ module Fixturex
         model_fixtures.each do |fixture|
           next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
 
-          acc << build_dependency_graph(fixture.path, fixture.name)
+          acc << build_dependency_tree(fixture.path, fixture.name)
         end
       end
     end

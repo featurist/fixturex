@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Fixturex do
   it 'returns self' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/things.yml'),
       'thing_1'
     )
@@ -17,7 +17,7 @@ RSpec.describe Fixturex do
   end
 
   it 'follows has_many associations' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/forests.yml'),
       'sherwood'
     )
@@ -88,7 +88,7 @@ RSpec.describe Fixturex do
   end
 
   it 'follows polymorphic associations' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/posts.yml'),
       'post_with_attachment'
     )
@@ -108,7 +108,7 @@ RSpec.describe Fixturex do
             value: {
               name: 'post_1_picture_2',
               path: Rails.root.join('test/fixtures/pictures.yml').to_s,
-              line: 5
+              line: 4
             },
             children: []
           },
@@ -126,7 +126,7 @@ RSpec.describe Fixturex do
   end
 
   it 'handles belongs_to with custom :class_name' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/writers.yml'),
       'kevin'
     )
@@ -148,7 +148,7 @@ RSpec.describe Fixturex do
   end
 
   it 'handles namespaced models' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/customers.yml'),
       'bob'
     )
@@ -170,7 +170,7 @@ RSpec.describe Fixturex do
   end
 
   it 'handles STI (fixtures reside in a file named after superclass)' do
-    tree = Fixturex::TreeBuilder.new.build_dependency_graph(
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/customers.yml'),
       'alice'
     )
