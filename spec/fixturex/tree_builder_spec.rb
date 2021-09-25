@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../lib/fixturex/tree_builder'
 
-RSpec.describe Fixturex do
+RSpec.describe Fixturex::TreeBuilder do
   it 'returns self' do
     tree = Fixturex::TreeBuilder.new.build_dependency_tree(
       Rails.root.join('test/fixtures/things.yml'),

@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Rails runner is hooked into spring an thus the whole thing runs faster
+Kernel.exec('rails', 'runner', File.expand_path('fixturex.rb', __dir__), *ARGV)

@@ -14,8 +14,7 @@ end
 
 require 'bundler/setup'
 require 'awesome_print'
-require 'fixturex'
-require 'json'
+require 'byebug'
 
 require_relative './dummy/config/environment'
 ActiveRecord::Schema.verbose = false

@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'fixturex'
   spec.version       = Fixturex::VERSION
   spec.authors       = ['artemave']
-  spec.email         = ['artemave@gmail.com']
+  spec.email         = ['mr@artem.rocks']
 
   spec.summary       = 'Rails fixture explorer'
   spec.description   = 'For a given fixture, builds a tree of "child" fixture following (deeply) `has_many/has_one` associations.'
@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   end
-  spec.bindir        = 'exe'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.bindir        = 'bin'
+  spec.executables   = ['fixturex']
   spec.require_paths = ['lib']
 
   spec.add_dependency('rails', '>= 6.0')
