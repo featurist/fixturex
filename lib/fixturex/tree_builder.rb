@@ -25,10 +25,12 @@ module Fixturex
     def self.fixtures_paths(class_name)
       fixtures_paths = []
       klass = class_name.constantize
+      # TODO: is there a better way to find out fixtures root directory?
+      fixtures_root = ActiveRecord::Tasks::DatabaseTasks.fixtures_path
 
       while klass < ActiveRecord::Base
         fixture_file = "#{klass.to_s.tableize}.yml"
-        path = Rails.root.join('test', 'fixtures', *fixture_file.split('/'))
+        path = File.join(fixtures_root, *fixture_file.split('/'))
 
         fixtures_paths << path if File.exist?(path)
 
@@ -48,7 +50,6 @@ module Fixturex
     private
 
     def fixture_set
-      # TODO: work out fixture root
       fixture_path.to_s.sub(%r{^.*/fixtures/}, '').sub('.yml', '')
     end
   end
