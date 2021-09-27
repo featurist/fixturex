@@ -72,8 +72,16 @@ module Fixturex
         model_fixtures.each do |fixture|
           next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
 
+          next if fixture_already_collected(acc, fixture)
+
           acc << build_dependency_tree(fixture.path, fixture.name)
         end
+      end
+    end
+
+    def fixture_already_collected(list, fixture)
+      list.find do |tree_entry|
+        tree_entry.value.path == fixture.path && tree_entry.value.name == fixture.name
       end
     end
 
