@@ -14,7 +14,7 @@ if ARGV.size != 2
   exit 1
 end
 
-tree = Fixturex::TreeBuilder.new.build_dependency_tree(ARGV[0], ARGV[1])
+tree = Fixturex::TreeBuilder.new.build_dependency_tree(Rails.root.join(ARGV[0]), ARGV[1])
 
 if options[:json]
   require 'json'
