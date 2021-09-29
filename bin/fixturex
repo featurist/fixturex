@@ -2,4 +2,13 @@
 # frozen_string_literal: true
 
 # Rails runner is hooked into spring an thus the whole thing runs faster
-Kernel.exec('rails', 'runner', File.expand_path('fixturex.rb', __dir__), *ARGV)
+IO.popen(['rails', 'runner', File.expand_path('fixturex.rb', __dir__), *ARGV], err: %i[child out]) do |stdout|
+  stdout.each do |line|
+    # Thanks a lot spring. How about an environment variable to silence your bullshit messages?
+    next if line =~ /Running via Spring preloader/
+
+    puts line
+  end
+end
+
+exit $?.to_i > 0 ? 1 : 0
