@@ -1,5 +1,9 @@
 # Fixturex [![Ruby](https://github.com/artemave/fixturex/actions/workflows/ruby.yml/badge.svg)](https://github.com/artemave/fixturex/actions/workflows/ruby.yml)
 
+Rails fixtures explorer.
+
+## Description
+
 Rails fixtures are hard work. There are different sides to that, but one particular thing is that it's not obvious what other fixtures reference the one you're looking at and what fixtures reference those ones referencing the one you're looking at. And so on.
 
 This little gem to the rescue. It's a command line tool that shows reference tree for a given fixture. It plugs in to vim's quickfix and it shouldn't be much work to plug it into vscode, if anyone is up for it.
