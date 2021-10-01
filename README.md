@@ -1,4 +1,4 @@
-# Fixturex [![Ruby](https://github.com/artemave/fixturex/actions/workflows/ruby.yml/badge.svg)](https://github.com/artemave/fixturex/actions/workflows/ruby.yml)
+# Fixturex [![Ruby](https://github.com/artemave/fixturex/actions/workflows/ruby.yml/badge.svg)](https://github.com/artemave/fixturex/actions/workflows/ruby.yml)  [![Gem Version](https://badge.fury.io/rb/fixturex.svg)](https://badge.fury.io/rb/fixturex)
 
 Rails fixtures explorer.
 
