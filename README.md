@@ -38,7 +38,7 @@ Or install it yourself as:
     
 ### Vim
 
-Here is one way to plug it into vim. Define a new command - let's call it `Fixturex` - in your (project) vimrc:
+Here is one way to plug it into vim. Define a new command - let's call it `Fixturex` - in your ([project](https://andrew.stwrt.ca/posts/project-specific-vimrc/)) vimrc:
 
 ```vim
 command! -nargs=0 Fixturex :cexpr system('bundle exec fixturex '. expand('%') .' '.shellescape(expand('<cword>'))) | copen
