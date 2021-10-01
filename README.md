@@ -40,7 +40,7 @@ Or install it yourself as:
 
 Here is one way to plug it into vim. Define a new command - let's call it `Fixturex` - in your (project) vimrc:
 
-```vimscript
+```vim
 command! -nargs=0 Fixturex :cexpr system('bundle exec fixturex '. expand('%') .' '.shellescape(expand('<cword>'))) | copen
 ```
 
