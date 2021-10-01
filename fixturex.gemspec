@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['artemave']
   spec.email         = ['mr@artem.rocks']
 
-  spec.summary       = 'Rails fixture explorer'
-  spec.description   = 'For a given fixture, builds a tree of "child" fixture following (deeply) `has_many/has_one` associations.'
+  spec.summary       = 'Rails fixtures explorer'
+  spec.description   = 'Generates a tree of "child" fixtures following (deeply) `has_many/has_one` associations.'
   spec.homepage      = 'https://github.com/featurist/fixturex'
   spec.license       = 'MIT'
   spec.required_ruby_version = Gem::Requirement.new('>= 2.3.0')
