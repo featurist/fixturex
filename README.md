@@ -35,6 +35,16 @@ Or install it yourself as:
 ## Usage
 
     $ bundle exec fixturex test/fixtures/things.yml thing1
+    
+### Vim
+
+Here is one way to plug it into vim. Define a new command - let's call it `Fixturex` - in your (project) vimrc:
+
+```vimscript
+command! -nargs=0 Fixturex :cexpr system('bundle exec fixturex '. expand('%') .' '.shellescape(expand('<cword>'))) | copen
+```
+
+From then on, if the cursor is on the fixture name in a fixture file, running `:Fixturex` will populate the quickfix window with the reference tree.
 
 ## Development
 
