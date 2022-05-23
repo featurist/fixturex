@@ -55,6 +55,10 @@ module Fixturex
   end
 
   class TreeBuilder
+    def self.cache
+      @cache ||= {}
+    end
+
     def build_dependency_tree(fixture_path, fixture_name)
       TreeEntry.new(
         FixtureLocation.new(fixture_path, fixture_name),
@@ -67,7 +71,7 @@ module Fixturex
     def nested_fixtures_locations(parent_fixture_model_class, parent_fixture_name)
       associations_for_nested_models(parent_fixture_model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
-        model_fixtures = ModelFixtures.load(association.class_name)
+        model_fixtures = self.class.cache[association.class_name] ||= ModelFixtures.load(association.class_name)
 
         model_fixtures.each do |fixture|
           next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
