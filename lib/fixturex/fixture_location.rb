@@ -10,7 +10,7 @@ module Fixturex
 
     def line
       @line ||= File.readlines(path).index do |line|
-        line.match?(/^#{name}:/)
+        line.match?(/^#{Regexp.escape(name)}:/)
       end + 1
     end
 
