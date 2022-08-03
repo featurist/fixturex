@@ -67,10 +67,11 @@ module Fixturex
 
     private
 
-    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize
     def nested_fixtures_locations(parent_fixture_model_class, parent_fixture_name)
       associations_for_nested_models(parent_fixture_model_class).each_with_object([]) do |association, acc|
-        belongs_to_attribute = belongs_to_attribute_for_association(association)
+        next unless (belongs_to_attribute = belongs_to_attribute_for_association(association))
+
         child_model_class = association_model_class(association)
         model_fixtures = self.class.cache[association.class_name] ||= ModelFixtures.load(child_model_class)
 
@@ -83,7 +84,7 @@ module Fixturex
         end
       end
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
 
     def association_model_class(association)
       class_name = association.class_name
@@ -103,8 +104,12 @@ module Fixturex
     end
 
     def associations_for_nested_models(model_class)
-      model_class.reflect_on_all_associations(:has_many) +
+      (
+        model_class.reflect_on_all_associations(:has_many) +
         model_class.reflect_on_all_associations(:has_one)
+      ).reject do |association|
+        association.is_a?(ActiveRecord::Reflection::ThroughReflection)
+      end
     end
 
     def belongs_to_attribute_for_association(association)
@@ -114,7 +119,7 @@ module Fixturex
         child_model_class = association_model_class(association)
         child_model_class.reflect_on_all_associations(:belongs_to).find do |belongs_to_association|
           belongs_to_association.class_name == association.active_record.name
-        end.name.to_s
+        end&.name&.to_s
       end
     end
   end

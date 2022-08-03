@@ -164,6 +164,23 @@ RSpec.describe Fixturex::TreeBuilder do
               line: 2
             },
             children: []
+          },
+          {
+            value: {
+              name: 'sub1',
+              path: Rails.root.join('test/fixtures/finance/subscriptions.yml').to_s,
+              line: 1
+            },
+            children: [
+              {
+                value: {
+                  name: 'subscription_event_1',
+                  path: Rails.root.join('test/fixtures/finance/subscription_events.yml').to_s,
+                  line: 1
+                },
+                children: []
+              }
+            ]
           }
         ]
       )

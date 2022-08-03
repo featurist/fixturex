@@ -53,7 +53,9 @@ ActiveRecord::Schema.define(version: 1) do
     t.column :customer_id, :integer
   end
 
-  create_table :finance_subscriptions, force: true
+  create_table :finance_subscriptions, force: true do |t|
+    t.column :customer_id, :integer
+  end
 
   create_table :finance_subscription_events, force: true do |t|
     t.column :finance_subscription_id, :integer
@@ -62,6 +64,10 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :addresses, force: true do |t|
     t.column :type, :string
     t.column :customer_id, :integer
+  end
+
+  create_table :votes, force: true do |t|
+    t.column :post_id, :integer
   end
 end
 # rubocop:enable Metrics/BlockLength
