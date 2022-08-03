@@ -207,4 +207,34 @@ RSpec.describe Fixturex::TreeBuilder do
       )
     )
   end
+
+  # If a namespaced model `has_many` another model under the same namespace, then Rails association model class
+  # contains no namespace, which is wrong and blows up when constantized.
+  it 'handles implicit namespace' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
+      Rails.root.join('test/fixtures/finance/subscriptions.yml'),
+      'sub1'
+    )
+    expect(JSON.pretty_generate(tree.to_h)).to eq(
+      JSON.pretty_generate(
+        {
+          value: {
+            name: 'sub1',
+            path: Rails.root.join('test/fixtures/finance/subscriptions.yml').to_s,
+            line: 1
+          },
+          children: [
+            {
+              value: {
+                name: 'subscription_event_1',
+                path: Rails.root.join('test/fixtures/finance/subscription_events.yml').to_s,
+                line: 1
+              },
+              children: []
+            }
+          ]
+        }
+      )
+    )
+  end
 end

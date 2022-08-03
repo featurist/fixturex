@@ -11,30 +11,29 @@ module Fixturex
   class ModelFixtures
     Fixture = Struct.new(:name, :path, :attributes)
 
-    def self.load(class_name)
-      fixtures_paths(class_name).each_with_object([]) do |path, acc|
+    def self.load(model_class)
+      fixtures_paths(model_class).each_with_object([]) do |path, acc|
         fixtures = YAML.load_file(path)
         fixtures.select! do |_name, attributes|
           # if fixture has `type` - STI - then we only want type == class_name
-          attributes['type'].nil? || attributes['type'] == class_name
+          attributes['type'].nil? || attributes['type'] == model_class.name
         end
         acc.concat(fixtures.map { |name, attributes| Fixture.new(name, path, attributes) })
       end
     end
 
-    def self.fixtures_paths(class_name)
+    def self.fixtures_paths(model_class)
       fixtures_paths = []
-      klass = class_name.constantize
       # TODO: is there a better way to find out fixtures root directory?
       fixtures_root = ActiveRecord::Tasks::DatabaseTasks.fixtures_path
 
-      while klass < ActiveRecord::Base
-        fixture_file = "#{klass.to_s.tableize}.yml"
+      while model_class < ActiveRecord::Base
+        fixture_file = "#{model_class.to_s.tableize}.yml"
         path = File.join(fixtures_root, *fixture_file.split('/'))
 
         fixtures_paths << path if File.exist?(path)
 
-        klass = klass.superclass
+        model_class = model_class.superclass
       end
       fixtures_paths
     end
@@ -68,10 +67,12 @@ module Fixturex
 
     private
 
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def nested_fixtures_locations(parent_fixture_model_class, parent_fixture_name)
       associations_for_nested_models(parent_fixture_model_class).each_with_object([]) do |association, acc|
         belongs_to_attribute = belongs_to_attribute_for_association(association)
-        model_fixtures = self.class.cache[association.class_name] ||= ModelFixtures.load(association.class_name)
+        child_model_class = association_model_class(association)
+        model_fixtures = self.class.cache[association.class_name] ||= ModelFixtures.load(child_model_class)
 
         model_fixtures.each do |fixture|
           next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
@@ -81,6 +82,18 @@ module Fixturex
           acc << build_dependency_tree(fixture.path, fixture.name)
         end
       end
+    end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+    def association_model_class(association)
+      class_name = association.class_name
+
+      unless Object.const_defined?(class_name)
+        namespace = association.active_record.name.split('::')[0..-2].join('::')
+        class_name = "#{namespace}::#{class_name}"
+      end
+
+      class_name.constantize
     end
 
     def fixture_already_collected(list, fixture)
@@ -98,7 +111,10 @@ module Fixturex
       if association.type.present?
         association.type.sub('_type', '')
       else
-        association.active_record.name.tableize.singularize
+        child_model_class = association_model_class(association)
+        child_model_class.reflect_on_all_associations(:belongs_to).find do |belongs_to_association|
+          belongs_to_association.class_name == association.active_record.name
+        end.name.to_s
       end
     end
   end
