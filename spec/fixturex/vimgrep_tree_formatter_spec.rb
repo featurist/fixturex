@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'ostruct'
 require 'spec_helper'
 require_relative '../../lib/fixturex/vimgrep_tree_formatter'
 require_relative '../../lib/fixturex/fixture_location'

@@ -54,8 +54,9 @@ module Fixturex
   end
 
   class TreeBuilder
-    def self.cache
-      @cache ||= {}
+    def initialize
+      @circut_breaker = Set.new
+      @cache = {}
     end
 
     def build_dependency_tree(fixture_path, fixture_name)
@@ -73,13 +74,16 @@ module Fixturex
         next unless (belongs_to_attribute = belongs_to_attribute_for_association(association))
 
         child_model_class = association_model_class(association)
-        model_fixtures = self.class.cache[association.class_name] ||= ModelFixtures.load(child_model_class)
+        model_fixtures = @cache[association.class_name] ||= ModelFixtures.load(child_model_class)
 
         model_fixtures.each do |fixture|
           next if fixture.attributes.fetch(belongs_to_attribute, '').to_s.sub(/ .*/, '') != parent_fixture_name
 
           next if fixture_already_collected(acc, fixture)
 
+          next if @circut_breaker.include?([fixture.path, fixture.name])
+
+          @circut_breaker.add([fixture.path, fixture.name])
           acc << build_dependency_tree(fixture.path, fixture.name)
         end
       end
