@@ -179,6 +179,14 @@ RSpec.describe Fixturex::TreeBuilder do
                   line: 1
                 },
                 children: []
+              },
+              {
+                value: {
+                  name: 'sub1_sftp_client',
+                  path: Rails.root.join('test/fixtures/finance/sftp_clients.yml').to_s,
+                  line: 1
+                },
+                children: []
               }
             ]
           }
@@ -248,10 +256,52 @@ RSpec.describe Fixturex::TreeBuilder do
                 line: 1
               },
               children: []
+            },
+            {
+              value: {
+                name: 'sub1_sftp_client',
+                path: Rails.root.join('test/fixtures/finance/sftp_clients.yml').to_s,
+                line: 1
+              },
+              children: []
             }
           ]
         }
       )
     )
+  end
+
+  it 'handles circular references with circuit breaker' do
+    # Create a circular reference: parent john -> child jane -> parent john
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
+      Rails.root.join('test/fixtures/parents.yml'),
+      'john'
+    )
+    
+    # Should find john -> jane -> john (one level deep), but prevent infinite recursion
+    expect(tree.children.length).to eq(1)
+    jane_child = tree.children.first
+    expect(jane_child.value.name).to eq('jane')
+    
+    # jane should have john as child (favorite_parent), but john should have no children due to circuit breaker
+    expect(jane_child.children.length).to eq(1)
+    john_grandchild = jane_child.children.first
+    expect(john_grandchild.value.name).to eq('john')
+    expect(john_grandchild.children.length).to eq(0) # circuit breaker prevents further recursion
+  end
+
+  it 'resolves to namespaced AR class when non-AR class exists with same name' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
+      Rails.root.join('test/fixtures/finance/subscriptions.yml'),
+      'sub1'
+    )
+
+    # Should find both subscription_events and sftp_client as children
+    expect(tree.children.length).to eq(2)
+
+    # Find the sftp_client child
+    sftp_client_child = tree.children.find { |child| child.value.name == 'sub1_sftp_client' }
+    expect(sftp_client_child).not_to be_nil
+    expect(sftp_client_child.value.path.to_s).to include('finance/sftp_clients.yml')
   end
 end
