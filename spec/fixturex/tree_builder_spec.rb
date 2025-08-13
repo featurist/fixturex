@@ -277,12 +277,12 @@ RSpec.describe Fixturex::TreeBuilder do
       Rails.root.join('test/fixtures/parents.yml'),
       'john'
     )
-    
+
     # Should find john -> jane -> john (one level deep), but prevent infinite recursion
     expect(tree.children.length).to eq(1)
     jane_child = tree.children.first
     expect(jane_child.value.name).to eq('jane')
-    
+
     # jane should have john as child (favorite_parent), but john should have no children due to circuit breaker
     expect(jane_child.children.length).to eq(1)
     john_grandchild = jane_child.children.first
@@ -303,5 +303,24 @@ RSpec.describe Fixturex::TreeBuilder do
     sftp_client_child = tree.children.find { |child| child.value.name == 'sub1_sftp_client' }
     expect(sftp_client_child).not_to be_nil
     expect(sftp_client_child.value.path.to_s).to include('finance/sftp_clients.yml')
+  end
+
+  it 'handles namespaced model with has_many to differently namespaced association' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
+      Rails.root.join('test/fixtures/subscriptions/carts.yml'),
+      'cart_1'
+    )
+
+    # Should find version associations without trying to constantize Subscriptions::PaperTrail::Version
+    expect(tree.children.length).to eq(2)
+
+    # Both versions should be found
+    version_names = tree.children.map { |child| child.value.name }.sort
+    expect(version_names).to eq(['cart_version_1', 'cart_version_2'])
+
+    # All versions should be from the paper_trail/versions.yml fixture
+    tree.children.each do |child|
+      expect(child.value.path.to_s).to include('paper_trail/versions.yml')
+    end
   end
 end

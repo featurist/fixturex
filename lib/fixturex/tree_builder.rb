@@ -94,6 +94,10 @@ module Fixturex
       namespace = association.active_record.name.split('::')[0..-2].join('::')
       class_name = [namespace, association.class_name].filter(&:present?).join('::')
 
+      unless Object.const_defined?(class_name)
+        class_name = association.class_name
+      end
+
       class_name.constantize
     end
 
