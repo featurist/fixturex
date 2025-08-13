@@ -15,27 +15,31 @@ module Fixturex
       fixtures_paths(model_class).each_with_object([]) do |path, acc|
         fixtures = YAML.load_file(path)
         fixtures.select! do |_name, attributes|
-          # if fixture has `type` - STI - then we only want type == class_name
-          attributes['type'].nil? || attributes['type'] == model_class.name
+          attributes['type'].nil? || attributes['type'].constantize <= model_class
         end
         acc.concat(fixtures.map { |name, attributes| Fixture.new(name, path, attributes) })
       end
     end
 
     def self.fixtures_paths(model_class)
-      fixtures_paths = []
       # TODO: is there a better way to find out fixtures root directory?
       fixtures_root = ActiveRecord::Tasks::DatabaseTasks.fixtures_path
 
-      while model_class < ActiveRecord::Base
-        fixture_file = "#{model_class.to_s.tableize}.yml"
+      # Make subclasses/ancestors discoverable
+      Rails.application.eager_load!
+
+      superclasses = model_class.ancestors.select do |ancestor|
+        ancestor < ActiveRecord::Base
+      end
+
+      (
+        superclasses + [model_class] + model_class.subclasses
+      ).filter_map do |klass|
+        fixture_file = "#{klass.to_s.tableize}.yml"
         path = File.join(fixtures_root, *fixture_file.split('/'))
 
-        fixtures_paths << path if File.exist?(path)
-
-        model_class = model_class.superclass
+        path if File.exist?(path)
       end
-      fixtures_paths
     end
   end
 

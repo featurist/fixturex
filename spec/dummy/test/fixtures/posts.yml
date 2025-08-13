@@ -1,5 +1,11 @@
 post_with_attachment:
   name: Stuff
+  user: john
 
 post_1:
   name: Post 1
+  user: john
+
+regular_post:
+  name: Regular Post
+  user: john

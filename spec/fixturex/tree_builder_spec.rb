@@ -323,4 +323,34 @@ RSpec.describe Fixturex::TreeBuilder do
       expect(child.value.path.to_s).to include('paper_trail/versions.yml')
     end
   end
+
+  it 'finds STI subclass fixtures in separate files when building dependency tree' do
+    tree = Fixturex::TreeBuilder.new.build_dependency_tree(
+      Rails.root.join('test/fixtures/users.yml'),
+      'john'
+    )
+
+    # This test SHOULD find both regular posts and blog posts for user john
+    # Expected: 3 regular posts + 2 blog posts = 5 total
+    expect(tree.children.length).to eq(5)
+
+    # Should find all posts including STI subclass fixtures from separate files
+    post_names = tree.children.map { |child| child.value.name }.sort
+    expected_posts = ['johns_blog_post_1', 'johns_blog_post_2', 'post_1', 'post_with_attachment', 'regular_post']
+    expect(post_names).to eq(expected_posts)
+
+    # Verify blog posts come from blog_posts.yml
+    blog_posts = tree.children.select { |child| child.value.name.start_with?('johns_blog_post') }
+    expect(blog_posts.length).to eq(2)
+    blog_posts.each do |blog_post|
+      expect(blog_post.value.path.to_s).to include('blog_posts.yml')
+    end
+
+    # Verify regular posts come from posts.yml
+    regular_posts = tree.children.reject { |child| child.value.name.start_with?('johns_blog_post') }
+    expect(regular_posts.length).to eq(3)
+    regular_posts.each do |regular_post|
+      expect(regular_post.value.path.to_s).to include('posts.yml')
+    end
+  end
 end

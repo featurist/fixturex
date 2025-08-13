@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
+  belongs_to :user
   has_one :attachment, as: :attachable
   has_many :pictures, as: :imageable
 

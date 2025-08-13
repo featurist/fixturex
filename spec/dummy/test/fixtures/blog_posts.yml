@@ -1,0 +1,14 @@
+johns_blog_post_1:
+  type: BlogPost
+  name: John's First Blog Post
+  user: john
+
+johns_blog_post_2:
+  type: BlogPost
+  name: John's Second Blog Post
+  user: john
+
+janes_blog_post:
+  type: BlogPost
+  name: Jane's Blog Post
+  user: jane
